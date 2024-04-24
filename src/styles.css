@@ -1,0 +1,109 @@
+@import "open-props/style";
+@import url("https://fonts.cdnfonts.com/css/pt-banana-split");
+
+.pt-banana {
+  font-family: "PT Banana Split", sans-serif;
+}
+
+/* this makes the view transition (VT) pseudo elements not steal clicks */
+::view-transition {
+  pointer-events: none;
+}
+
+/* removes view transition on the page */
+/* helps isolate the morph effect to the grid */
+:root {
+  view-transition-name: none;
+}
+
+/* make all the VT animations springy! */
+::view-transition-group(*) {
+  animation-timing-function: var(--ease-squish-1);
+  animation-timing-function: var(--ease-spring-2);
+  animation-duration: 2s;
+}
+
+/* this makes the box shape size morphs better */
+::view-transition-old(*),
+::view-transition-new(*) {
+  /* height: 100%;
+  width: 100%; */
+}
+
+@keyframes zoom-in {
+  0%,
+  100% {
+    scale: 1;
+  }
+  /* 35% {
+        scale: 1.2;
+    } */
+}
+@keyframes zoom-out {
+  0%,
+  100% {
+    scale: 1;
+  }
+  /* 35% {
+        scale: 0.8;
+    } */
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* custom animation for new boxes coming in */
+  /* uses Open Props animation and easing props */
+  /* https://open-props.style/#animations */
+  ::view-transition-new(*) {
+    /* animation: var(--animation-slide-in-up) forwards; */
+    /* animation-timing-function: var(--ease-squish-1); */
+    animation-name: zoom-in;
+    animation-fill-mode: forwards;
+    animation-timing-function: var(--ease-spring-2);
+  }
+
+  /* custom animation for old boxes going out */
+  ::view-transition-old(*) {
+    animation-name: zoom-out;
+    animation-fill-mode: forwards;
+    /* animation: var(--animation-slide-out-down) forwards, var(--animation-fade-out) forwards; */
+  }
+}
+
+body {
+  background-image: linear-gradient(to bottom right, #9a2720, #5d0a2a);
+  overflow: hidden;
+}
+
+@keyframes rotisserie {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+.app-wrapper {
+  position: relative;
+  overflow: hidden;
+  &::before,
+  &::after {
+    position: absolute;
+    content: "";
+    width: 100vmin;
+    height: 100vmin;
+    background-image: url(/assets/onion-strip.png);
+    background-size: 100%;
+    background-repeat: no-repeat;
+
+    z-index: -1;
+    opacity: 0.1;
+    scale: 3;
+    rotate: 45deg;
+    translate: -150% -100%;
+    animation: rotisserie 100s ease-in-out infinite;
+  }
+  &::after {
+    translate: 150% 100%;
+    animation-duration: 160s;
+  }
+}
