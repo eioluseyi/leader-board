@@ -1,9 +1,4 @@
 @import "open-props/style";
-@import url("https://fonts.cdnfonts.com/css/pt-banana-split");
-
-.pt-banana {
-  font-family: "PT Banana Split", sans-serif;
-}
 
 /* this makes the view transition (VT) pseudo elements not steal clicks */
 ::view-transition {

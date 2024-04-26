@@ -3,6 +3,7 @@ import ContestantList from "./ContestantList";
 import { flushSync } from "react-dom";
 import { twMerge } from "tailwind-merge";
 import Timer from "./Timer";
+import Pusher from "pusher-js";
 
 function getRanks(array: any[]) {
   // Updating rank based on points
@@ -53,11 +54,16 @@ const handleTransitionFlush = (cb: () => void) => {
 function App() {
   const [processedData, setProcessedData] = React.useState<any[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
-  const leaderboardUrl = import.meta.env.VITE_FETCH_URL;
+
+  const LEADERBOARD_URL = import.meta.env.VITE_FETCH_URL;
+  const PUSHER_KEY = import.meta.env.VITE_PUSHER_KEY;
+  const PUSHER_CHANNEL = import.meta.env.VITE_PUSHER_CHANNEL;
+  const PUSHER_EVENT = import.meta.env.VITE_PUSHER_EVENT;
+  const PUSHER_CLUSTER = import.meta.env.VITE_PUSHER_CLUSTER;
 
   const getData = React.useCallback(async () => {
     try {
-      const response = await fetch(leaderboardUrl);
+      const response = await fetch(LEADERBOARD_URL);
       const res = await response.json();
 
       const data = getProcessedData(res?.data || []);
@@ -71,11 +77,27 @@ function App() {
   }, []);
 
   React.useEffect(() => {
-    const timer = setInterval(getData, 5000);
+    // const timer = setInterval(getData, 5000);
     handleTransitionFlush(() => setIsLoading(true));
     getData();
-    return () => clearInterval(timer);
+    // return () => clearInterval(timer);
   }, [getData]);
+
+  React.useEffect(() => {
+    const pusher = new Pusher(PUSHER_KEY, {
+      cluster: PUSHER_CLUSTER,
+      encrypted: true,
+    } as any);
+    const channel = pusher.subscribe(PUSHER_CHANNEL);
+    channel.bind(PUSHER_EVENT, (data: any) => {
+      const pusherData = getProcessedData(data || []);
+      handleTransitionFlush(() => setProcessedData(pusherData));
+    });
+
+    return () => {
+      channel.unbind(PUSHER_EVENT);
+    };
+  }, []);
 
   return (
     <div className="place-items-center grid app-wrapper h-[100svh] overflow-hidden">
