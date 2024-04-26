@@ -6,11 +6,18 @@ import { useWindowSize } from "./hooks";
 const Timer = () => {
   const { width, height } = useWindowSize();
   const [showConfetti, setShowConfetti] = React.useState(false);
+
+  const startValue = import.meta.env.VITE_TIME_START;
+  const endValue = import.meta.env.VITE_TIME_END;
+
   const startDate = React.useMemo(
-    () => new Date("2024-04-25T21:58:31.406Z"),
+    () => (startValue ? new Date(startValue) : new Date()),
     []
   );
-  const endDate = React.useMemo(() => new Date("2024-04-25T23:01:10.406Z"), []);
+  const endDate = React.useMemo(
+    () => (endValue ? new Date(endValue) : new Date()),
+    []
+  );
 
   const { hours, minutes, seconds } = useProTime(startDate, endDate, true);
 
@@ -18,7 +25,11 @@ const Timer = () => {
   const isEnded = new Date().getTime() - endDate.getTime() >= -1000;
 
   React.useEffect(() => {
-    if (isStarted && isEnded) setShowConfetti(true);
+    if (!endValue) return;
+    if (!isStarted) return;
+    if (!isEnded) return;
+
+    setShowConfetti(true);
   }, [isStarted, isEnded]);
 
   return (

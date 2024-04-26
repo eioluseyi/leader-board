@@ -53,12 +53,11 @@ const handleTransitionFlush = (cb: () => void) => {
 function App() {
   const [processedData, setProcessedData] = React.useState<any[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
+  const leaderboardUrl = import.meta.env.VITE_FETCH_URL;
 
   const getData = React.useCallback(async () => {
     try {
-      const response = await fetch(
-        "https://qa-api.squadinc.co/virtual-account/v1/leader_board"
-      );
+      const response = await fetch(leaderboardUrl);
       const res = await response.json();
 
       const data = getProcessedData(res?.data || []);
